@@ -1,0 +1,26 @@
+{
+  "name": "task-manager-alkfejl",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "Angular.ng-template",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+  "postCreateCommand": "dotnet --info && node --version && npm --version && kubectl version --client && helm version",
+  "forwardPorts": [
+    4200,
+    5000,
+    5001
+  ]
+}
