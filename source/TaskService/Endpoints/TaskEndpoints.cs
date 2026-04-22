@@ -1,4 +1,5 @@
 using Domain;
+using TaskService.Repositories;
 using TaskService.Requests;
 using TaskItem = Domain.Task;
 using TaskStatus = Domain.TaskStatus;
@@ -7,38 +8,25 @@ namespace TaskService.Endpoints;
 
 public static class TaskEndpoints
 {
-    public static IEndpointRouteBuilder MapTaskEndpoints(this IEndpointRouteBuilder app, List<TaskItem> tasks)
+    public static IEndpointRouteBuilder MapTaskEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/tasks", (string? status, string? search) =>
+        app.MapGet("/tasks", async (string? status, string? search, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
-            IEnumerable<TaskItem> result = tasks;
-
-            if (!string.IsNullOrWhiteSpace(status) &&
-                Enum.TryParse<TaskStatus>(status, true, out var parsedStatus))
-            {
-                result = result.Where(task => task.Status == parsedStatus);
-            }
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                result = result.Where(task =>
-                    task.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    task.Description.Contains(search, StringComparison.OrdinalIgnoreCase));
-            }
+            var result = await repository.GetAllAsync(status, search, cancellationToken);
 
             return Results.Ok(result);
         });
 
-        app.MapGet("/tasks/{id:guid}", (Guid id) =>
+        app.MapGet("/tasks/{id:guid}", async (Guid id, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
-            var task = tasks.FirstOrDefault(task => task.Id == id);
+            var task = await repository.GetByIdAsync(id, cancellationToken);
 
             return task is not null
                 ? Results.Ok(task)
                 : Results.NotFound();
         });
 
-        app.MapPost("/tasks", (CreateTaskRequest request) =>
+        app.MapPost("/tasks", async (CreateTaskRequest request, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
             var task = new TaskItem
             {
@@ -52,57 +40,45 @@ public static class TaskEndpoints
                 UpdatedAt = DateTime.UtcNow
             };
 
-            tasks.Add(task);
+            var createdTask = await repository.CreateAsync(task, cancellationToken);
 
-            return Results.Created($"/tasks/{task.Id}", task);
+            return Results.Created($"/tasks/{createdTask.Id}", createdTask);
         });
 
-        app.MapPut("/tasks/{id:guid}", (Guid id, UpdateTaskRequest request) =>
+        app.MapPut("/tasks/{id:guid}", async (Guid id, UpdateTaskRequest request, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
-            var existingTask = tasks.FirstOrDefault(task => task.Id == id);
-
-            if (existingTask is null)
+            var task = new TaskItem
             {
-                return Results.NotFound();
-            }
+                Title = request.Title,
+                Description = request.Description,
+                Status = request.Status,
+                Priority = request.Priority,
+                DueDate = request.DueDate
+            };
 
-            existingTask.Title = request.Title;
-            existingTask.Description = request.Description;
-            existingTask.Status = request.Status;
-            existingTask.Priority = request.Priority;
-            existingTask.DueDate = request.DueDate;
-            existingTask.UpdatedAt = DateTime.UtcNow;
+            var updatedTask = await repository.UpdateAsync(id, task, cancellationToken);
 
-            return Results.Ok(existingTask);
+            return updatedTask is not null
+                ? Results.Ok(updatedTask)
+                : Results.NotFound();
         });
 
-        app.MapPatch("/tasks/{id:guid}/status", (Guid id, UpdateTaskStatusRequest request) =>
+        app.MapPatch("/tasks/{id:guid}/status", async (Guid id, UpdateTaskStatusRequest request, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
-            var existingTask = tasks.FirstOrDefault(task => task.Id == id);
+            var updatedTask = await repository.UpdateStatusAsync(id, request.Status, cancellationToken);
 
-            if (existingTask is null)
-            {
-                return Results.NotFound();
-            }
-
-            existingTask.Status = request.Status;
-            existingTask.UpdatedAt = DateTime.UtcNow;
-
-            return Results.Ok(existingTask);
+            return updatedTask is not null
+                ? Results.Ok(updatedTask)
+                : Results.NotFound();
         });
 
-        app.MapDelete("/tasks/{id:guid}", (Guid id) =>
+        app.MapDelete("/tasks/{id:guid}", async (Guid id, ITaskRepository repository, CancellationToken cancellationToken) =>
         {
-            var existingTask = tasks.FirstOrDefault(task => task.Id == id);
+            var deleted = await repository.DeleteAsync(id, cancellationToken);
 
-            if (existingTask is null)
-            {
-                return Results.NotFound();
-            }
-
-            tasks.Remove(existingTask);
-
-            return Results.NoContent();
+            return deleted
+                ? Results.NoContent()
+                : Results.NotFound();
         });
 
         return app;
