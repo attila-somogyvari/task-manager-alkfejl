@@ -1,5 +1,6 @@
 using Domain;
 using System.Text.Json.Serialization;
+using TaskService.Configuration;
 using TaskService.Endpoints;
 using TaskService.Repositories;
 
@@ -8,7 +9,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
-builder.Services.AddSingleton<ITaskRepository, InMemoryTaskRepository>();
+builder.Services.Configure<MongoDbSettings>(
+    builder.Configuration.GetSection(MongoDbSettings.SectionName));
+builder.Services.AddSingleton<ITaskRepository, MongoTaskRepository>();
 
 var app = builder.Build();
 
