@@ -1,8 +1,16 @@
 FROM mcr.microsoft.com/devcontainers/dotnet:1-9.0-bookworm
 
-RUN apt-get update \
+# Remove stale Yarn apt source if present, otherwise apt-get update can fail.
+RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn*.list \
+    && apt-get update \
     && apt-get install -y --no-install-recommends curl ca-certificates git unzip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install .NET 10 SDK
+RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh \
+    && chmod +x /tmp/dotnet-install.sh \
+    && /tmp/dotnet-install.sh --channel 10.0 --install-dir /usr/share/dotnet \
+    && rm /tmp/dotnet-install.sh
 
 # Install Node.js 22
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
