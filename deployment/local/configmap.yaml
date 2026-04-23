@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: taskmanager-config
+  namespace: taskmanager-app
+data:
+  MongoDb__ConnectionString: mongodb://taskmanager-mongodb.taskmanager-infra.svc.cluster.local:27017
+  MongoDb__DatabaseName: TaskManagerDB
+  MongoDb__TasksCollectionName: Tasks
+  TaskService__BaseUrl: http://taskservice:8080

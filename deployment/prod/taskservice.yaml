@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taskservice
+  namespace: taskmanager-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: taskservice
+  template:
+    metadata:
+      labels:
+        app: taskservice
+    spec:
+      containers:
+        - name: taskservice
+          image: ghcr.io/attila-somogyvari/task-manager-alkfejl/taskservice:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+:8080
+          envFrom:
+            - configMapRef:
+                name: taskmanager-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: taskservice
+  namespace: taskmanager-app
+spec:
+  selector:
+    app: taskservice
+  ports:
+    - port: 8080
+      targetPort: 8080
+  type: ClusterIP
