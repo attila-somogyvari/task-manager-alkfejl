@@ -1,0 +1,54 @@
+services:
+  mongodb:
+    image: mongo:8.2.5
+    container_name: taskmanager-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+
+  taskservice:
+    build:
+      context: .
+      dockerfile: source/TaskService/Dockerfile
+    container_name: taskmanager-taskservice
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      MongoDb__ConnectionString: mongodb://mongodb:27017
+      MongoDb__DatabaseName: TaskManagerDB
+      MongoDb__TasksCollectionName: Tasks
+    ports:
+      - "5095:8080"
+
+  mcpservice:
+    build:
+      context: .
+      dockerfile: source/McpService/Dockerfile
+    container_name: taskmanager-mcpservice
+    restart: unless-stopped
+    depends_on:
+      - taskservice
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      TaskService__BaseUrl: http://taskservice:8080
+    ports:
+      - "5044:8080"
+
+  webui:
+    build:
+      context: ./source/WebUI
+      dockerfile: Dockerfile
+    container_name: taskmanager-webui
+    restart: unless-stopped
+    depends_on:
+      - taskservice
+      - mcpservice
+    ports:
+      - "4200:80"
+
+volumes:
+  mongodb-data:

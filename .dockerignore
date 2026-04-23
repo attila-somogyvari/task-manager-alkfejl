@@ -1,0 +1,16 @@
+.git
+.github
+.devcontainer
+**/bin
+**/obj
+**/node_modules
+**/dist
+**/.angular
+**/.vscode
+**/*.user
+**/*.tmp
+**/*.temp
+Dockerfile*
+deployment
+diagrams
+docs
