@@ -1,0 +1,90 @@
+<main class="dashboard-shell">
+  <section class="hero-card">
+    <div class="hero-copy">
+      <p class="eyebrow">Task Manager</p>
+      <h1>Attekintheto feladatkezeles egy letisztult kezdonezettel.</h1>
+      <p class="hero-text">
+        Ez a kezdo WebUI mar mutatja a lista, szures es allapotkovetes alap iranyat, amire majd a
+        valodi backend-integracio epul.
+      </p>
+    </div>
+
+    <div class="stats-grid">
+      <article class="stat-card">
+        <span class="stat-label">Osszes feladat</span>
+        <strong>{{ totalTasks() }}</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Folyamatban</span>
+        <strong>{{ inProgressTasks() }}</strong>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Lezart</span>
+        <strong>{{ completedTasks() }}</strong>
+      </article>
+    </div>
+  </section>
+
+  <section class="toolbar-card">
+    <label class="search-field">
+      <span>Kereses</span>
+      <input
+        #searchInput
+        type="text"
+        placeholder="Kereses cim vagy leiras alapjan"
+        [value]="searchTerm()"
+        (input)="updateSearchTerm(searchInput.value)"
+      />
+    </label>
+
+    <div class="status-filter" aria-label="Statusz szuro">
+      @for (status of availableStatuses; track status) {
+        <button
+          type="button"
+          class="filter-chip"
+          [class.active]="selectedStatus() === status"
+          (click)="selectStatus(status)"
+        >
+          {{ status === 'All' ? 'Osszes' : status }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="task-list-section">
+    <div class="section-heading">
+      <h2>Feladatok</h2>
+      <span>{{ filteredTasks().length }} elem</span>
+    </div>
+
+    <div class="task-grid">
+      @for (task of filteredTasks(); track task.id) {
+        <article class="task-card">
+          <div class="task-topline">
+            <span class="status-badge" [class]="'status-' + task.status.toLowerCase()">
+              {{ task.status }}
+            </span>
+            <span class="priority-badge" [class]="'priority-' + task.priority.toLowerCase()">
+              {{ task.priority }}
+            </span>
+          </div>
+
+          <div class="task-copy">
+            <h3>{{ task.title }}</h3>
+            <p>{{ task.description }}</p>
+          </div>
+
+          <div class="task-meta">
+            <span>Hatarido</span>
+            <strong>{{ task.dueDate }}</strong>
+          </div>
+        </article>
+      } @empty {
+        <article class="empty-state">
+          <h3>Nincs talalat</h3>
+          <p>A jelenlegi szurok mellett nincs megjelenitheto feladat.</p>
+        </article>
+      }
+    </div>
+  </section>
+</main>
