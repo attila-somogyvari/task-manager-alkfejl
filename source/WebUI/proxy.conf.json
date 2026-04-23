@@ -1,0 +1,8 @@
+{
+  "/tasks": {
+    "target": "http://host.docker.internal:5095",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

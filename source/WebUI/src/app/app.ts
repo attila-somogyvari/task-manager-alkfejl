@@ -1,17 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-type TaskStatus = 'Todo' | 'InProgress' | 'Done';
-type TaskPriority = 'Low' | 'Medium' | 'High';
-
-interface TaskItem {
-  id: number;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  dueDate: string;
-}
+import { TaskItem, TaskStatus } from './models/task.model';
+import { TaskApiService } from './services/task-api.service';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +12,9 @@ interface TaskItem {
   styleUrl: './app.css',
 })
 export class App {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly taskApiService = inject(TaskApiService);
+
   protected readonly searchTerm = signal('');
   protected readonly selectedStatus = signal<'All' | TaskStatus>('All');
   protected readonly availableStatuses: Array<'All' | TaskStatus> = [
@@ -28,41 +23,9 @@ export class App {
     'InProgress',
     'Done',
   ];
-
-  protected readonly tasks = signal<TaskItem[]>([
-    {
-      id: 1,
-      title: 'TaskService vegpontok ellenorzese',
-      description: 'A backend lista, letrehozas es statuszmodositas vegpontjainak atnezese.',
-      status: 'InProgress',
-      priority: 'High',
-      dueDate: '2026-04-24',
-    },
-    {
-      id: 2,
-      title: 'MCP muveletek dokumentalasa',
-      description: 'A tamogatott toolok rovid osszefoglalasa a bemutatohoz.',
-      status: 'Todo',
-      priority: 'Medium',
-      dueDate: '2026-04-25',
-    },
-    {
-      id: 3,
-      title: 'Dev Container stabilizalasa',
-      description: 'A fejlesztoi kornyezet vegleges ellenorzese es takaritasa.',
-      status: 'Done',
-      priority: 'High',
-      dueDate: '2026-04-23',
-    },
-    {
-      id: 4,
-      title: 'WebUI alap nezet kialakitasa',
-      description: 'Task lista, szuresek es vizualis alapok kialakitasa Angularban.',
-      status: 'InProgress',
-      priority: 'High',
-      dueDate: '2026-04-26',
-    },
-  ]);
+  protected readonly tasks = signal<TaskItem[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly errorMessage = signal('');
 
   protected readonly filteredTasks = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -87,11 +50,91 @@ export class App {
     () => this.tasks().filter((task) => task.status === 'InProgress').length,
   );
 
+  constructor() {
+    this.loadTasks();
+  }
+
   protected updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
   }
 
   protected selectStatus(status: 'All' | TaskStatus): void {
     this.selectedStatus.set(status);
+  }
+
+  protected refreshTasks(): void {
+    this.loadTasks();
+  }
+
+  protected cycleTaskStatus(task: TaskItem): void {
+    const nextStatus = this.getNextStatus(task.status);
+
+    this.taskApiService
+      .updateTaskStatus(task.id, nextStatus)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updatedTask) => {
+          this.tasks.update((tasks) =>
+            tasks.map((item) => (item.id === updatedTask.id ? updatedTask : item)),
+          );
+        },
+        error: () => {
+          this.errorMessage.set('A statuszmodositas most nem sikerult.');
+        },
+      });
+  }
+
+  protected deleteTask(taskId: string): void {
+    this.taskApiService
+      .deleteTask(taskId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.tasks.update((tasks) => tasks.filter((task) => task.id !== taskId));
+        },
+        error: () => {
+          this.errorMessage.set('A torles most nem sikerult.');
+        },
+      });
+  }
+
+  protected formatDueDate(value: string | null): string {
+    if (!value) {
+      return 'Nincs megadva';
+    }
+
+    return new Date(value).toLocaleDateString('hu-HU');
+  }
+
+  private loadTasks(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.taskApiService
+      .getTasks()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (tasks) => {
+          this.tasks.set(tasks);
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.errorMessage.set(
+            'A backend jelenleg nem elerheto. Ellenorizd, hogy fut-e a TaskService a 5095-os porton.',
+          );
+          this.isLoading.set(false);
+        },
+      });
+  }
+
+  private getNextStatus(status: TaskStatus): TaskStatus {
+    switch (status) {
+      case 'Todo':
+        return 'InProgress';
+      case 'InProgress':
+        return 'Done';
+      default:
+        return 'Todo';
+    }
   }
 }

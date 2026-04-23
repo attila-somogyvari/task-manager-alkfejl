@@ -48,6 +48,8 @@
           {{ status === 'All' ? 'Osszes' : status }}
         </button>
       }
+
+      <button type="button" class="filter-chip refresh-chip" (click)="refreshTasks()">Frissites</button>
     </div>
   </section>
 
@@ -56,6 +58,20 @@
       <h2>Feladatok</h2>
       <span>{{ filteredTasks().length }} elem</span>
     </div>
+
+    @if (errorMessage()) {
+      <article class="feedback-card error-card">
+        <strong>Backend kapcsolat hiba</strong>
+        <p>{{ errorMessage() }}</p>
+      </article>
+    }
+
+    @if (isLoading()) {
+      <article class="feedback-card loading-card">
+        <strong>Betoltes folyamatban</strong>
+        <p>A feladatok lekerdezese a TaskService-bol.</p>
+      </article>
+    }
 
     <div class="task-grid">
       @for (task of filteredTasks(); track task.id) {
@@ -76,7 +92,16 @@
 
           <div class="task-meta">
             <span>Hatarido</span>
-            <strong>{{ task.dueDate }}</strong>
+            <strong>{{ formatDueDate(task.dueDate) }}</strong>
+          </div>
+
+          <div class="task-actions">
+            <button type="button" class="action-button secondary-button" (click)="cycleTaskStatus(task)">
+              Kovetkezo statusz
+            </button>
+            <button type="button" class="action-button danger-button" (click)="deleteTask(task.id)">
+              Torles
+            </button>
           </div>
         </article>
       } @empty {
