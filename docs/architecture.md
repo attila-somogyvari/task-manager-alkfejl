@@ -1,14 +1,14 @@
-# Architektúra leírás
+# Architektura leiras
 
-## Áttekintés
+## Attekintes
 
-A projekt egy egyszerű feladatkezelő rendszer, amely több komponensből álló architektúrával készül.
+A projekt egy feladatkezelo rendszer, amely tobb komponensbol allo architekturaval keszult.
 
-A cél egy olyan rendszer kialakítása, amely nemcsak alkalmazáslogikai szinten működik, hanem fejlesztési, konténerizációs, CI/CD és telepítési szempontból is rendezett felépítésű.
+A cel egy olyan rendszer kialakitasa, amely nemcsak alkalmazaslogikai szinten mukodik, hanem fejlesztesi, kontenerizacios, CI/CD es telepitesi szempontbol is rendezett felepitesu.
 
-## Fő komponensek
+## Fo komponensek
 
-A rendszer fő elemei:
+A rendszer fo elemei:
 
 - `WebUI`
 - `TaskService`
@@ -19,43 +19,43 @@ A rendszer fő elemei:
 
 ### WebUI
 
-A `WebUI` a rendszer frontend komponense, amely Angular alapon készül.
+A `WebUI` a rendszer Angular alapu frontendje.
 
 Feladatai:
 
-- feladatok megjelenítése
-- új feladat létrehozása
-- meglévő feladat szerkesztése
-- feladat törlése
-- státusz módosítása
-- keresés és szűrés
+- a feladatok megjelenitese
+- statusz szerinti szures
+- keresesi feltetelek kezelese
+- ujratoltes
+- statuszmodositas inditasa
+- torles inditasa
 
-A frontend a `TaskService` API-jával kommunikál.
+A frontend HTTP API-n keresztul a `TaskService` komponenssel kommunikal.
 
 ### TaskService
 
-A `TaskService` a fő backend komponens, amely ASP.NET alapon készül.
+A `TaskService` a fo backend szolgaltatas, amely ASP.NET minimal API alapon keszult.
 
 Feladatai:
 
-- a feladatok kezeléséhez tartozó üzleti logika megvalósítása
-- CRUD műveletek biztosítása
-- szűrési és keresési műveletek kezelése
-- adatbázis-kommunikáció megvalósítása
+- a feladatokhoz tartozo uzleti logika megvalositasa
+- CRUD jellegu API biztositas
+- szuresi es keresesi muveletek kiszolgalasa
+- MongoDB perzisztencia kezelese
 
-A `TaskService` közvetlenül a MongoDB adatbázist használja.
+A `TaskService` kozvetlenul a MongoDB adatbazist hasznalja.
 
 ### McpService
 
-A `McpService` külön backend komponensként készül.
+A `McpService` kulon backend komponenskent keszult.
 
 Feladatai:
 
-- MCP műveletek biztosítása a feladatkezelő domainhez
-- a feladatok lekérdezése és kezelése MCP toolokon keresztül
-- kapcsolódás a `TaskService` által biztosított funkciókhoz vagy azonos domain logikához
+- MCP toolok biztositasa a feladatkezelo domainhez
+- a `TaskService` vegpontjainak elerese HTTP kliensen keresztul
+- MCP alapu kerdezesek es modositasok kiszolgalasa
 
-Tervezett MCP műveletek:
+Megvalositott MCP muveletek:
 
 - `GetTasks`
 - `SearchTasks`
@@ -65,19 +65,19 @@ Tervezett MCP műveletek:
 
 ### MongoDB
 
-A MongoDB a rendszer perzisztens adattárolója.
+A MongoDB a rendszer perzisztens adattaroloja.
 
 Feladatai:
 
-- feladatok tárolása
-- módosítások megőrzése
-- lekérdezések kiszolgálása a backend számára
+- feladatok tarolasa
+- modositasok megorzese
+- lekerdezesek kiszolgalasa a backend szamara
 
 ## Domain modell
 
-A rendszer elsődleges domain entitása a `Task`.
+A rendszer elsoleges domain entitasa a `Task`.
 
-Tervezett mezői:
+Fobb mezoi:
 
 - `id`
 - `title`
@@ -88,37 +88,40 @@ Tervezett mezői:
 - `createdAt`
 - `updatedAt`
 
-A `status` és a `priority` előre definiált értékkészletből választott mezők lesznek.
+A `status` es a `priority` enum alapu mezok:
 
-## Kapcsolatok
+- `TaskStatus`: `Todo`, `InProgress`, `Done`
+- `TaskPriority`: `Low`, `Medium`, `High`
 
-A rendszer fő kommunikációs irányai:
+## Kommunikacios kapcsolatok
 
-- a felhasználó a `WebUI` felületen keresztül használja a rendszert
-- a `WebUI` HTTP API-n keresztül hívja a `TaskService` komponenst
-- a `TaskService` a MongoDB adatbázissal kommunikál
-- a `McpService` külön komponensként MCP műveleteket biztosít a feladatkezelő domainhez
+A rendszer fo kommunikacios iranyai:
 
-## Telepítési szemlélet
+- a felhasznalo a `WebUI` feluleten keresztul hasznalja a rendszert
+- a `WebUI` a `TaskService` HTTP API-t hivja
+- a `TaskService` a MongoDB adatbazissal kommunikal
+- a `McpService` a `TaskService` API-ra epitve biztosit MCP toolokat
 
-A rendszer minden fő komponense konténerizált formában készül.
+## Telepitesi szemlelet
 
-Tervezett telepítési környezet:
+A rendszer minden fo komponense kontenerizalt formaban keszul.
 
-- Docker alapú build
-- GitHub Actions alapú CI
-- Kubernetes alapú futtatás
-- ArgoCD alapú CD
+A telepitesi lanc elemei:
 
-A MongoDB helyi Kubernetes klaszteren Helm chart segítségével kerül telepítésre.
+- Dev Container alapu fejlesztoi kornyezet
+- Docker es Docker Compose alapu lokalis futtatas
+- GitHub Actions alapu CI
+- Kubernetes alapu futtatas
+- Helm alapu MongoDB telepites
+- ArgoCD alapu CD
 
-## Tervezési alapelvek
+## Tervezesi alapelvek
 
-A projekt kialakításánál a következő szempontok a meghatározók:
+A projekt kialakitasanal a kovetkezo szempontok voltak meghatarozok:
 
-- egyszerű domain
-- jól elkülönülő komponensek
-- könnyen bemutatható működés
-- tárgyi követelmények teljes lefedése
-- rendezett repository-struktúra
-- fokozatosan felépíthető fejlesztési folyamat
+- egyszeru domain
+- jol elkulonulo komponensek
+- konnyen bemutathato mukodes
+- targyi kovetelmenyek teljes lefedese
+- rendezett repository-struktura
+- fokozatosan felepitheto fejlesztesi folyamat

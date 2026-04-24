@@ -1,94 +1,106 @@
-# Felhasználói útmutató
+# Felhasznaloi utmutato
 
-## Bevezetés
+## Bevezetes
 
-A rendszer egy egyszerű feladatkezelő alkalmazás, amely lehetővé teszi a felhasználó számára a feladatok nyilvántartását és kezelését.
+A rendszer egy feladatkezelo alkalmazas, amely lehetove teszi a felhasznalo szamara a feladatok nyilvantartasat es kezeleset.
 
-A felhasználó a webes felületen keresztül tudja használni a rendszer fő funkcióit.
+A felhasznalo a webes feluleten keresztul tudja hasznalni a rendszer fo funkcioit.
 
-## A rendszer célja
+## A rendszer celja
 
-Az alkalmazás célja, hogy a felhasználó egyszerűen tudjon:
+Az alkalmazas celja, hogy a felhasznalo egyszeruen tudjon:
 
-- feladatokat létrehozni
-- meglévő feladatokat módosítani
-- feladatokat törölni
-- a feladatok állapotát követni
-- keresést és szűrést alkalmazni
+- feladatokat megtekinteni
+- feladatokat keresni
+- statusz szerint szurni
+- feladat statuszat modosittani
+- feladatokat torolni
 
 ## Kezelt adatok
 
-A rendszer a feladatokat kezeli.
+A rendszer feladatokat kezel.
 
-Egy feladat várhatóan az alábbi adatokat tartalmazza:
+Egy feladat a kovetkezo adatokat tartalmazhatja:
 
-- cím
-- leírás
-- állapot
-- prioritás
-- határidő
-- létrehozás ideje
-- módosítás ideje
+- cim
+- leiras
+- allapot
+- prioritas
+- hatarido
+- letrehozas ideje
+- modositas ideje
 
-## Fő funkciók
+## WebUI fo funkciok
 
-### Feladatok listázása
+### Feladatok listazasa
 
-A felhasználó megtekintheti az összes rögzített feladatot egy listanézetben.
+A felhasznalo megtekintheti az osszes rogzitett feladatot egy listanezetben.
 
-A lista célja, hogy gyors áttekintést adjon a rendszerben szereplő elemekről.
+### Kereses
 
-### Új feladat létrehozása
+A feluleten szoveges keresomezo segiti a gyors szurest.
 
-A felhasználó új feladatot hozhat létre a megfelelő űrlap segítségével.
+### Statusz szerinti szures
 
-A létrehozás során megadhatja a feladat legfontosabb adatait.
+A felhasznalo valaszthat az alabbi nezetek kozott:
 
-### Feladat módosítása
-
-A rendszer lehetőséget biztosít egy meglévő feladat adatainak módosítására.
-
-Ez különösen hasznos például akkor, ha változik a határidő, a prioritás vagy a feladat állapota.
-
-### Feladat törlése
-
-A felhasználó törölheti a már nem szükséges feladatokat.
-
-### Állapot módosítása
-
-A feladatok állapota módosítható.
-
-Tervezett állapotok például:
-
+- `All`
 - `Todo`
 - `InProgress`
 - `Done`
 
-### Keresés és szűrés
+### Frissites
 
-A rendszer lehetőséget biztosít egyszerű keresésre és szűrésre.
+A `Frissites` gomb ujra lekerni a backendtol a legfrissebb allapotot.
 
-Példák:
+### Kovetkezo statusz
 
-- keresés cím alapján
-- szűrés állapot szerint
+A feladatkartyakon elerheto gomb a kovetkezo allapotba lepteti a feladatot:
+
+- `Todo` -> `InProgress`
+- `InProgress` -> `Done`
+- `Done` -> `Todo`
+
+### Torles
+
+A `Torles` gomb eltavolitja a kivalasztott feladatot.
+
+## Backend API hasznalat
+
+A `TaskService` fo vegpontja a `/tasks`.
+
+Peldak:
+
+- `GET /tasks`
+- `GET /tasks?status=Todo`
+- `GET /tasks?search=teszt`
+- `POST /tasks`
+- `PATCH /tasks/{id}/status`
+- `DELETE /tasks/{id}`
 
 ## MCP komponens szerepe
 
-A rendszer része egy külön MCP komponens is.
+A rendszer resze egy kulon MCP komponens is.
 
-Ennek szerepe, hogy a feladatkezelő domain bizonyos műveletei MCP toolokon keresztül is elérhetők legyenek.
+Ennek szerepe, hogy a feladatkezelo domain bizonyos muveletei MCP eszkozokon keresztul is elerhetok legyenek.
 
-Tervezett MCP műveletek:
+Biztositott muveletek:
 
-- feladatok lekérdezése
-- keresés
-- új feladat létrehozása
-- feladat státuszának módosítása
-- feladat törlése
+- feladatok lekerdezese
+- keresesi muveletek
+- uj feladat letrehozasa
+- statuszmodositas
+- torles
 
-Ez a komponens elsősorban technológiai és architekturális célból része a projektnek.
+## Futtatasi modok
 
-## Jelenlegi állapot
+A rendszer tobb modon is futtathato:
 
-Ez a dokumentum jelenleg az első, előkészítő verzió. A rendszer elkészülésével a felhasználói műveletek pontos menete, a felületi elemek és a használati példák is részletesen dokumentálásra kerülnek.
+- Dev Container alapu fejlesztoi kornyezetben
+- Docker Compose stackkent
+- minikube klaszteren Kubernetes manifestekkel
+- ArgoCD altali GitOps szinkronizacioval
+
+## Megjegyzes
+
+A telepitesi lepesek es az uzemeltetesi reszletek a [Telepitesi utmutato](./deployment-guide.md) dokumentumban talalhatok.

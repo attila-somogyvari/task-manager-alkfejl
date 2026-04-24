@@ -1,66 +1,87 @@
-# Task Manager - Alkalmazásfejlesztés technológiái projekt
+# Task Manager - Alkalmazasfejlesztes technologiai
 
-Ez a repository az **Alkalmazásfejlesztés technológiái** tárgyhoz készülő projektet tartalmazza.
+Ez a repo az **Alkalmazasfejlesztes technologiai** targyhoz keszult projektunket tartalmazza.
 
-A projekt célja egy egyszerű, de technológiailag teljes rendszer megvalósítása, amely a fejlesztéstől a telepítésig bemutatja egy modern alkalmazás életciklusának főbb lépéseit.
+A projekt celja egy feladatkezelo rendszer megvalositasa volt, amely a modern (relativ) alkalmazasfejlesztes fobb lepeseit egy nyomonkovetheto megoldason keresztul mutatja be: a fejlesztoi kornyezettol a konteneres futtatason at egeszen a Kubernetes es ArgoCD alapu telepitesig.
 
-## Projekt célja
+## Task Manager
 
-A rendszer egy feladatkezelő alkalmazás lesz, amelyben a felhasználó feladatokat tud:
+A rendszer maga egy feladatkezelo alkalmazas, amelyben a kovetkezo muveletek vegezhetok:
 
-- listázni
-- létrehozni
-- szerkeszteni
-- törölni
-- állapot szerint kezelni
-- egyszerűen keresni és szűrni
+- feladatok listazasa
+- uj feladatok letrehozasa
+- feladatok torlese
+- statusz modositas (ToDO - InProgress - Done)
+- kereses es szures
 
-A projekt célja nem egy bonyolult domain modell kialakítása, hanem egy jól strukturált, több komponensből álló rendszer elkészítése.
+## Fo komponensek
 
-## Fő komponensek
+A rendszer fo elemei:
 
-A rendszer tervezett fő komponensei:
+- `WebUI` - Angular alapu frontend
+- `TaskService` - ASP.NET alapu backend szolgaltatas
+- `McpService` - MCP komponens
+- `MongoDB` - adatbazis
 
-- `WebUI` - Angular alapú frontend
-- `TaskService` - ASP.NET alapú backend szolgáltatás
-- `McpService` - külön MCP komponens
-- `MongoDB` - adatbázis
+## Hasznalt technologiak
 
-## Tervezett technológiák
-
-A projekt jelenlegi technológiai iránya:
-
-- Frontend: Angular
-- Backend: ASP.NET
-- Adatbázis: MongoDB
-- Konténerizáció: Docker
+- Frontend: Angular, TypeScript
+- Backend: ASP.NET, C#
+- Adatbazis: MongoDB
+- Kontenerizacio: Docker, Docker Compose
 - CI: GitHub Actions
-- Telepítés: Kubernetes
+- Telepites: Kubernetes, Helm
 - CD: ArgoCD
 
-## Repository felépítése
+## Repo felepitese
 
-A projekt főbb mappái:
+- `.devcontainer/` - fejlesztoi kornyezet konfig
+- `.github/workflows/` - CI workflow
+- `deployment/` - Kubernetes es ArgoCD telepitesi allomanyok
+- `diagrams/` - architektura abrak
+- `docs/` - projekt dokumentacio
+- `source/` - forraskod
 
-- `.devcontainer/` - fejlesztői környezet konfiguráció
-- `.github/workflows/` - CI workflow-k
-- `deployment/` - Kubernetes és ArgoCD telepítési fájlok
-- `diagrams/` - architektúra ábrák
-- `docs/` - projekt dokumentáció
-- `source/` - forráskód
+## Dokumentacio
 
-## Dokumentáció
+A reszletes dokumentacio a `docs` mappaban talalhato:
 
-A részletes dokumentáció a `docs` mappában található:
+- [Architektura leiras](./docs/architecture.md)
+- [Telepitesi utmutato](./docs/deployment-guide.md)
+- [Felhasznaloi utmutato](./docs/user-guide.md)
 
-- [Architektúra leírás](./docs/architecture.md)
-- [Telepítési útmutató](./docs/deployment-guide.md)
-- [Felhasználói útmutató](./docs/user-guide.md)
+## Jelenlegi allapot
 
-## Jelenlegi állapot
+A projekt jelenleg tartalmazza:
 
-A repository jelenleg az alap projektstruktúrát és a tervezési kiindulópontot tartalmazza. A fejlesztés lépésről lépésre fog felépülni a backend, frontend, MCP, Docker, Kubernetes és ArgoCD részekkel együtt.
+- domain modell implementaciojat (feladatkezeles)
+- `TaskService` backend API-t MongoDB perzisztenciaval
+- `McpService` MCP eszkozeit
+- Angular frontendet
+- Docker Compose alapu teljes stack futtatast
+- GitHub Actions CI workflow-kat
+- local es prod Kubernetes manifesteket
+- ArgoCD alapu CD konfigot
 
-## Megjegyzés
+## Gyors inditas
 
-A projekt kialakításánál a kapott mintarepo referenciaként és inspirációként szolgál, de a megoldás nem annak egy az egyben történő másolata.
+Lokalis konteneres futtatas:
+
+```powershell
+docker compose build
+docker compose up
+```
+
+Fo eleresi pontok:
+
+- `WebUI`: [http://localhost:4200](http://localhost:4200)
+- `TaskService`: [http://localhost:5095/tasks](http://localhost:5095/tasks)
+- `McpService`: [http://localhost:5044/mcp](http://localhost:5044/mcp)
+
+Kubernetes es ArgoCD telepitesi lepesek:
+
+- [docs/deployment-guide.md](./docs/deployment-guide.md)
+
+## Megjegyzes
+
+A projekt kialakitasanal a kapott mintarepo referenciakent szolgalt.
